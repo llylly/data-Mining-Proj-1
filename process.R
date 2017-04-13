@@ -1,4 +1,5 @@
 library(tm)
+library(NLP)
 
 # It reads the content set and constructs a Corpus object for it
 # @paremeter docData[["content"]]
@@ -17,40 +18,6 @@ getCorpus <- function(contentList) {
 	res <- tm_map(res, removeWords, stopwords("english"))
 	stem <- tm_map(res, stemDocument)
 	return(stem)
-}
-
-# Reads a docCorpus and calculate the frequency of each word in each doc
-# @parameter docCorpus(type: Corpus)
-# @return wordBag(type: list[docList[word: frequency]])
-getBagOfWords <- function(corpus) {
-	ans <- list()
-	mat <- DocumentTermMatrix(corpus)
-	totDoc <- dim(mat)[1]
-	for (i in 1:totDoc) {
-		now <- list()
-		nowMat <- mat[i,]
-		j <- 1
-		while (length(findFreqTerms(nowMat, j)) > 0) {
-			words <- findFreqTerms(nowMat, j, j)
-			if (length(words) > 0)
-				for (word in words)
-					now[word] <- j
-			j <- j+1
-		}
-		ans[i] <- list(now)
-	}
-	return(ans)
-}
-
-# Reads a docData and calculate the frequency of each word in each doc
-# @parameter docData(type: data.frame)
-# @return wordBag(type: list[docList[word: frequency]])
-getAllBagOfWords <- function(data) {
-	contentList <- data[["content"]]
-	corpus <- getCorpus(contentList)
-	print(corpus)
-	bag <- getBagOfWords(corpus)
-	return(bag)
 }
 
 # Draw word cloud of words which appears at least "minLimit" times
@@ -174,25 +141,11 @@ drawTimeLine <- function(data, toPdf = 0) {
 	return(set)
 }
 
-# Calculate wordMatrix from wordBag
-# @parameter wordBag(type: list[docList[word: frequency]])
+# Calculate word matrix
+# @parameter docCorpus(type: Corpus)
 # @return wordMatrix(type: matrix)
-# Each row represents a document
-# Each column represents a word
-getWordMatrix <- function(bag) {
-	names <- character()
-	for (row in bag) {
-		names <- append(names, names(row))
-	}
-	names <- unique(names)
-	ans <- matrix(rep(0, length(bag)*length(names)), nrow = length(bag), ncol = length(names))
-	i <- 0
-	for (row in bag) {
-		i <- i+1
-		for (word in names(bag[[i]])) 
-			ans[i, which(names==word)] <- row[[word]]
-	}
-	return(ans)
+getWordMatrix <- function(corpus) {
+	return(as.matrix(DocumentTermMatrix(corpus)))
 }
 
 # Calculate document-category map from docData
