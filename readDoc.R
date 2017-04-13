@@ -1,5 +1,13 @@
 library(XML)
 
+# call readAll to get data
+# call extractAll to save data to a CSV
+
+# extractAll -> readAll -> readDoc
+
+# The function reads one doc and save it to a data frame
+# @paramter path
+# @return singleDocData(type: data.frame)
 readDoc <- function(path) {
 	categories <- character()
 	locations <- character()
@@ -75,6 +83,10 @@ readDoc <- function(path) {
 	return(ans)
 }
 
+# This func reads all docs in the directory and save as a data frame
+# The data frame is similar to a matrix
+# @paramter directoryPath
+# @return docData(type: data.frame)
 readAll <- function(dirPath) {
 	first = TRUE
 	data <- data.frame()
@@ -93,6 +105,10 @@ readAll <- function(dirPath) {
 	return(data)
 }
 
+# This func reads all docs in the directory and save them to the saveFile in CSV format
+# @parameter directoryPath
+# @parameter saveFilePath
+# @return null
 extractAll <- function(dirPath, saveFile) {
 	data <- readAll(dirPath)
 	write.csv(data, file=saveFile)
