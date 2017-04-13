@@ -1,6 +1,8 @@
 library(tm)
 
-# data[["content"]] should be the input parameter
+# It reads the content set and constructs a Corpus object for it
+# @paremeter docData[["content"]]
+# @return docCorpus(type: Corpus)
 getCorpus <- function(contentList) {
 	set <- character()
 	for (content in contentList) {
@@ -17,6 +19,9 @@ getCorpus <- function(contentList) {
 	return(stem)
 }
 
+# Reads a docCorpus and calculate the frequency of each word in each doc
+# @parameter docCorpus(type: Corpus)
+# @return wordBag(type: list[docList[word: frequency]])
 getBagOfWords <- function(corpus) {
 	ans <- list()
 	mat <- DocumentTermMatrix(corpus)
@@ -37,6 +42,9 @@ getBagOfWords <- function(corpus) {
 	return(ans)
 }
 
+# Reads a docData and calculate the frequency of each word in each doc
+# @parameter docData(type: data.frame)
+# @return wordBag(type: list[docList[word: frequency]])
 getAllBagOfWords <- function(data) {
 	contentList <- data[["content"]]
 	corpus <- getCorpus(contentList)
@@ -45,6 +53,11 @@ getAllBagOfWords <- function(data) {
 	return(bag)
 }
 
+# Draw word cloud of words which appears at least "minLimit" times
+# @paramter docCorpus(type: Corpus)
+# @parameter path
+# @parameter numeric
+# @return wordFrequencyMap(type: data.frame)
 drawWordCloud <- function(corpus, toPdf = 0, minLimit = 100) {
 	mat <- DocumentTermMatrix(corpus)
 	j <- minLimit
@@ -68,6 +81,12 @@ drawWordCloud <- function(corpus, toPdf = 0, minLimit = 100) {
 	return(data.frame(word=words, freq=times))
 }
 
+# Calculate word length from Corpus
+# @parameter docCorpus(type: Corpus)
+# @parameter path
+# @parameter numeric
+# @return wordLengthSamples(type: numeric)
+# draw: qplot(len, bins=max(len)-min(len)+1)
 drawWordLength <- function(corpus, toPdf = 0, minLimit = 0) {
 	mat <- DocumentTermMatrix(corpus)
 	words <- findFreqTerms(mat, minLimit)
@@ -80,11 +99,15 @@ drawWordLength <- function(corpus, toPdf = 0, minLimit = 0) {
 	} else if (length(dev.list()) == 0) {
 		x11()
 	}
-	qplot(sort(wordLength), bins=max(wordLength)-min(wordLength)+1)
+	qplot(len, bins=max(len)-min(len)+1)
 	if (toPdf != 0) dev.off()
 	return(len)
 }
 
+# Calculate the frequency of each category
+# @parameter docData(type: data.frame)
+# @paramter path
+# @return categoryFrequencyList(type: data.framem[categories, freq])
 drawCategories <- function(data, toPdf = 0) {
 	categories <- character()
 	set <- lapply(as.character(data[["categories"]]), strsplit, "[|]")
@@ -115,11 +138,16 @@ drawCategories <- function(data, toPdf = 0) {
 	} else if (length(dev.list()) == 0) {
 		x11()
 	}
-	qplot(freqList$categories, freqList$freq, geom="h", xlab="Categories", ylab="Frequency")
+	qplot(freqList$categories, freqList$freq, xlab="Categories", ylab="Frequency")
 	if (toPdf != 0) dev.off()
 	return(freqList)
 }
 
+# Calculate the publication time samples of documents
+# @parameter docData(type: data.frame)
+# @paramter path
+# @return timeSamples(type: numeric)
+# timeSamples is in month units and relatives to the minimum month
 drawTimeLine <- function(data, toPdf = 0) {
 	time <- lapply(as.character(data[["correction_data"]]), substr, 1, 6)
 	time <- unique(time)
@@ -134,6 +162,7 @@ drawTimeLine <- function(data, toPdf = 0) {
 	for (i in 1:dim(ans)[1]) {
 		set <- append(set, rep(ans$time[i] %/% 100 * 12 + ans$time[i] %% 100, times=ans$freq[i]))
 	}
+	print(min(set))
 	set <- set - min(set)
 	if (toPdf != 0) {
 		pdf(file = toPdf)
@@ -145,6 +174,11 @@ drawTimeLine <- function(data, toPdf = 0) {
 	return(set)
 }
 
+# Calculate wordMatrix from wordBag
+# @parameter wordBag(type: list[docList[word: frequency]])
+# @return wordMatrix(type: matrix)
+# Each row represents a document
+# Each column represents a word
 getWordMatrix <- function(bag) {
 	names <- character()
 	for (row in bag) {
@@ -161,6 +195,9 @@ getWordMatrix <- function(bag) {
 	return(ans)
 }
 
+# Calculate document-category map from docData
+# @parameter docData(type: data.frame)
+# @paramter documentCategoryMap(type: data.frame[id, category])
 getDocumentCategoryMap <- function(data) {
 	docIds <- numeric()
 	categories <- character()
@@ -178,6 +215,10 @@ getDocumentCategoryMap <- function(data) {
 	return(data.frame(id=docIds, category=categories))
 }
 
+# Calculate similarityMatrix from wordMatrix
+# @parameter wordMatrix(type: matrix)
+# @return similarityMatrix(type: matrix)
+# REQUIRES A LOT OF TIME!!!
 getSimilarityMat <- function(matrix) {
 	n <- dim(matrix)[1]
 	ans <- matrix(rep(0, n*n), n, n)
@@ -192,12 +233,67 @@ getSimilarityMat <- function(matrix) {
 	for (i in 2:n)
 		for (j in 1:(i-1)) 
 			ans[i,j] <- ans[j,i]
+	for (i in 1:n)
+		for (j in 1:n)
+			if (is.nan(matrix[i,j]))
+				matrix[i,j] <- 0
 	return(ans)
 }
 
+# Calculate Euclid length of a vector
+# @paramter vector
+# @return numeric
 dis <- function(vec) {
 	ans <- 0
 	for (x in vec) ans <- ans + x * x
 	ans <- sqrt(ans)
 	return(ans)
+}
+
+# Calculate the average similarity for category pair
+# @parameter docData(type: data.frame)
+# @parameter similarityMatrix(type: matrix)
+# @return relativityMatrix(type: matrix)
+getCrossDistance <- function(data, matrix) {
+	categoryMap <- getDocumentCategoryMap(data)
+	categoryArr <- unique(categoryMap$category)
+	n <- length(unique(categoryArr))
+	ansMat <- matrix(nrow = n, ncol = n)
+	for (i in 1:n)
+		for (j in 1:n) {
+			cate1 <- categoryArr[i]
+			cate2 <- categoryArr[j]
+			now1 <- categoryMap$id[which(categoryMap$category==cate1)]
+			now2 <- categoryMap$id[which(categoryMap$category==cate2)]
+			cnt <- 0
+			ans <- 0
+			for (ii in now1)
+				for (jj in now2) 
+					if ((i != j) || (ii != jj))  {
+						ans <- ans + matrix[ii,jj]
+						cnt <- cnt + 1
+					}
+			if (cnt == 0) {
+				cnt <- 1
+				ans <- 1
+			}
+			ansMat[i,j] <- ans / cnt
+		}
+	return(data.frame(category = categoryArr, ansMat))
+}
+
+# Query the relativity between two categories
+# @parameter relativityMatrix(type: matrix)
+# @parameter character(name of category 1)
+# @parameter character(name of category 2)
+# @return numeric(relativity value for legal category names, and -1 for illegal category names)
+queryDistance <- function(crossMat, type1, type2) {
+	c1 <- which(crossMat$category == type1)
+	c2 <- which(crossMat$category == type2)
+	crossMat <- crossMat[,(dim(crossMat)[2] - dim(crossMat)[1] + 1):(dim(crossMat)[2])]
+	if (length(c1) * length(c2) > 0) {
+		return(crossMat[c1,c2 + 1])
+	} else {
+		return(-1)
+	}
 }
