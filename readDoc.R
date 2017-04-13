@@ -1,4 +1,5 @@
 library(XML)
+library(stringr)
 
 readDoc <- function(path) {
 	categories <- character()
@@ -7,6 +8,7 @@ readDoc <- function(path) {
 	month <- NA
 	year <- NA
 	
+	# parse XML
 	rootNode <- xmlRoot(xmlParse(path))
 	headNode <- rootNode[["head"]]
 		titleNode <- headNode[["title"]]
@@ -54,8 +56,11 @@ readDoc <- function(path) {
 				}
 			}
 	
+	# extract info from nodes
 	title <- xmlValue(titleNode)
 	docid <- as.numeric(docidAttr)
+	
+	# normalize categories & locations like "|a|b|c", allow duplicate
 	categories <- tolower(categories)
 	categories <- gsub("[(]", ", ", categories)
 	categories <- gsub("[)]", ", ", categories)
@@ -67,8 +72,12 @@ readDoc <- function(path) {
 	locationsStr <- ""
 	for (i in locations)
 		locationsStr <- paste(locationsStr, i, sep="|")
+	
+	# may not exist, set NA instead
 	if (categoriesStr == "") categoriesStr = NA
 	if (locationsStr == "") locationsStr = NA
+	
+	# return data.frame
 	ans <- data.frame(title=title, docid=docid, categories=categoriesStr, 
 		day_of_month=day_of_month, month=month, year=year, correction_data=correction_data, locations= locationsStr,
 		content=content)
@@ -88,6 +97,7 @@ readAll <- function(dirPath) {
 			first = FALSE
 			data <- as.data.frame(nowData)
 		} else 
+			# concatenate
 			data <- rbind(data, nowData)
 	}
 	return(data)
@@ -95,5 +105,7 @@ readAll <- function(dirPath) {
 
 extractAll <- function(dirPath, saveFile) {
 	data <- readAll(dirPath)
+	
+	# save to csc format
 	write.csv(data, file=saveFile)
 }
