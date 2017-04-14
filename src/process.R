@@ -1,6 +1,6 @@
 library(tm)
 library(NLP)
-
+library(ggplot2)
 # It reads the content set and constructs a Corpus object for it
 # @paremeter docData[["content"]]
 # @return docCorpus(type: Corpus)
@@ -100,14 +100,17 @@ drawCategories <- function(data, toPdf = 0) {
 	}
 	freqList <- freqList[sort(freqList $freq, decreasing=TRUE, index.return=TRUE)$ix,]
 	freqList$categories <- ordered(freqList$categories, levels=as.character(freqList$categories))
-	if (toPdf != 0) {
-		pdf(file = toPdf)
-	} else if (length(dev.list()) == 0) {
-		x11()
-	}
-	qplot(freqList$categories, freqList$freq, xlab="Categories", ylab="Frequency")
-	if (toPdf != 0) dev.off()
-	return(freqList)
+	df=data.frame(categories = freqList$categories, freq = freqList$freq)
+#	if (toPdf != 0) {
+#		pdf(file = toPdf)
+#	} else if (length(dev.list()) == 0) {
+#		x11()
+#	}
+	pic = ggplot(data = df, mapping = aes(x = categories, y = freq)) + geom_bar(stat= 'identity')+ theme(axis.text.x = element_text( angle = 45))
+	if (toPdf != 0) ggsave(pic, file=toPdf)
+#	qplot(freqList$categories, freqList$freq, xlab="Categories", ylab="Frequency")
+#	if (toPdf != 0) dev.off()
+	return(df)
 }
 
 # Calculate the publication time samples of documents
@@ -125,21 +128,61 @@ drawTimeLine <- function(data, toPdf = 0) {
 		ans$freq[which(ans$time==nowtime)] <-
 			ans$freq[which(ans$time==nowtime)] + 1
 	}
-	set <- numeric()
+#	set <- numeric()
+	first = ans$time[1]%/% 100 * 12 + ans$time[1] %% 100
 	for (i in 1:dim(ans)[1]) {
-		set <- append(set, rep(ans$time[i] %/% 100 * 12 + ans$time[i] %% 100, times=ans$freq[i]))
+#		set <- append(set, rep(ans$time[i] %/% 100 * 12 + ans$time[i] %% 100, times=ans$freq[i]))
+		ans$time[i] = ans$time[i] %/% 100 * 12 + ans$time[i] %% 100 - first
 	}
-	print(min(set))
-	set <- set - min(set)
-	if (toPdf != 0) {
-		pdf(file = toPdf)
-	} else if (length(dev.list()) == 0) {
-		x11()
-	}
-	qplot(ans, geom="histogram", xlab="Month", ylab="Frequency", bins=max(ans)-min(ans)+1)
-	if (toPdf != 0) dev.off()
-	return(set)
+#	print(min(set))
+#	set <- set - min(set)
+#	if (toPdf != 0) {
+#		pdf(file = toPdf)
+#	} else if (length(dev.list()) == 0) {
+#		x11()
+#	}
+#	pic = ggplot(ans, geom="histogram", xlab="Month", ylab="Frequency")
+	pic = ggplot(data=ans, mapping = aes(x=time, y=freq))+ geom_bar(stat= 'identity') + xlab("month")
+	if (toPdf != 0) ggsave(pic, file=toPdf)
+#	if (toPdf != 0) dev.off()
+	return(ans)
 }
+
+# Calculate the publication time samples of documents
+# @parameter docData(type: data.frame)
+# @paramter path
+# @return timeSamples(type: numeric)
+# timeSamples is in month units and relatives to the minimum month
+drawTimeLineYear <- function(data, toPdf = 0) {
+	time <- lapply(as.character(data[["correction_data"]]), substr, 1, 4)
+	time <- unique(time)
+	ans <- data.frame(time=as.numeric(time), freq=rep(0, length(time)))
+	dataf <- as.data.frame(data)
+	for (item in data$correction_data) {
+		nowtime <- as.numeric(substr(item, 1, 4))
+		ans$freq[which(ans$time==nowtime)] <-
+			ans$freq[which(ans$time==nowtime)] + 1
+	}
+#	set <- numeric()
+	first = ans$time[1]%/% 100 
+	for (i in 1:dim(ans)[1]) {
+#		set <- append(set, rep(ans$time[i] %/% 100 * 12 + ans$time[i] %% 100, times=ans$freq[i]))
+		#ans$time[i] = ans$time[i] %/% 100 - first
+	}
+#	print(min(set))
+#	set <- set - min(set)
+#	if (toPdf != 0) {
+#		pdf(file = toPdf)
+#	} else if (length(dev.list()) == 0) {
+#		x11()
+#	}
+#	pic = ggplot(ans, geom="histogram", xlab="Month", ylab="Frequency")
+	pic = ggplot(data=ans, mapping = aes(x=time, y=freq))+ geom_bar(stat= 'identity') + xlab("year")
+	if (toPdf != 0) ggsave(pic, file=toPdf)
+#	if (toPdf != 0) dev.off()
+	return(ans)
+}
+
 
 # Calculate word matrix
 # @parameter docCorpus(type: Corpus)
@@ -168,7 +211,7 @@ getDocumentCategoryMap <- function(data) {
 	return(data.frame(id=docIds, category=categories))
 }
 
-# Calculate similarityMatrix from wordMatrix
+# Calculate similarityMatrix from wordMatrix (getWordMatrix)
 # @parameter wordMatrix(type: matrix)
 # @return similarityMatrix(type: matrix)
 # REQUIRES A LOT OF TIME!!!
@@ -250,3 +293,63 @@ queryDistance <- function(crossMat, type1, type2) {
 		return(-1)
 	}
 }
+
+drawInnerDistance <- function(csv_data, toPdf){
+	data = read.csv(csv_data)
+	df = data.frame(categories=data$category,avg_dis=data$dis)
+	df = df[order(df$avg_dis,decreasing=TRUE),]
+	df$categories = factor(df$categories,levels=df$categories)
+	pic = ggplot(data = df, mapping = aes(x = categories, y = avg_dis)) + geom_bar(stat= 'identity')+ theme(axis.text.x = element_text( angle = 45))
+	if (toPdf != 0) ggsave(pic, file=toPdf)
+}
+
+drawSVDrepr <- function(corpus, doc2Pdf, word2Pdf, word_cnt){
+	mat <- DocumentTermMatrix(corpus,control = list(weighting = function(x) weightTfIdf(x, normalize = FALSE)))
+	res = svd(mat)
+	# 文档语义相关矩阵
+	datau <- data.frame(res$u[,1:2])
+	# 词项语义相关矩阵
+	datav <- data.frame(res$v[,1:2])
+	
+	l = length(mat$dimnames$Terms)
+	inte = round(l/word_cnt)
+	i = 100
+	s = c(0,0)
+	w = c(0)
+	while(i<l){
+		s = rbind(s,datav[i,])
+		w = rbind(w,mat$dimnames$Terms[i])
+		i = i + inte
+	}
+	print(s)
+	print(w)
+	
+	pic1 <- ggplot()+
+	  geom_point(data=datau,aes(X1,X2))+
+	  geom_text(data=datau,aes(X1,X2),
+	            label=1:500,vjust=2)
+	pic2 <- ggplot()+
+	  geom_point(data=s,aes(X1,X2))+
+	  geom_text(data=s,aes(X1,X2),
+	            label=w,vjust=2)
+	if (doc2Pdf != 0) ggsave(pic1, file= doc2Pdf)
+	if (word2Pdf != 0) ggsave(pic2, file= word2Pdf)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -9,8 +9,9 @@
 \BOOKMARK [2][-]{subsection.1.5}{画出单词长度的分布直方图}{section.1}% 9
 \BOOKMARK [2][-]{subsection.1.6}{画出新闻类别的分布直方图}{section.1}% 10
 \BOOKMARK [2][-]{subsection.1.7}{画出每个月新闻数量的分布直方图}{section.1}% 11
-\BOOKMARK [1][-]{section.2}{新闻相似度计算}{}% 12
-\BOOKMARK [2][-]{subsection.2.1}{计算新闻之间的余弦相似度矩阵}{section.2}% 13
-\BOOKMARK [2][-]{subsection.2.2}{计算类别内新闻之间的平均相似度}{section.2}% 14
-\BOOKMARK [2][-]{subsection.2.3}{计算两个类别的新闻之间的平均相似度}{section.2}% 15
-\BOOKMARK [1][-]{section.3}{扩展分析}{}% 16
+\BOOKMARK [2][-]{subsection.1.8}{画出每年新闻数量的分布直方图}{section.1}% 12
+\BOOKMARK [1][-]{section.2}{新闻相似度计算}{}% 13
+\BOOKMARK [2][-]{subsection.2.1}{计算新闻之间的余弦相似度矩阵}{section.2}% 14
+\BOOKMARK [2][-]{subsection.2.2}{计算类别内新闻之间的平均相似度}{section.2}% 15
+\BOOKMARK [2][-]{subsection.2.3}{计算两个类别的新闻之间的平均相似度}{section.2}% 16
+\BOOKMARK [1][-]{section.3}{扩展分析}{}% 17

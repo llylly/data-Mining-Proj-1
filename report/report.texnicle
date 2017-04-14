@@ -5,7 +5,7 @@
     <databaseInfo>
         <version>134481920</version>
         <UUID>2F1B3712-D981-42DA-B1BA-D630A6357397</UUID>
-        <nextObjectID>105</nextObjectID>
+        <nextObjectID>106</nextObjectID>
         <metadata>
             <plist version="1.0">
                 <dict>
@@ -75,12 +75,12 @@
         <relationship name="project" type="1/1" destination="PROJECT" idrefs="z104"></relationship>
     </object>
     <object type="UISETTINGS" id="z103">
-        <attribute name="pdfviewscrollrect" type="string">{{0, 1014.6935201402739}, {619.99999999995168, 806.76007005236829}}</attribute>
+        <attribute name="pdfviewscrollrect" type="string">{{0, 3196.4114832543528}, {619.99999999993656, 1100.5741626786757}}</attribute>
         <attribute name="showpdfthumbnails" type="bool">0</attribute>
         <attribute name="selectedcontrolstab" type="int16">0</attribute>
         <attribute name="maxoutlinedepth" type="int16">7</attribute>
         <attribute name="logoutputlevel" type="int16">2</attribute>
-        <attribute name="editorwidth" type="float">846</attribute>
+        <attribute name="editorwidth" type="float">786</attribute>
         <attribute name="controlswidth" type="float">220</attribute>
         <attribute name="consoleview" type="int16">0</attribute>
         <relationship name="project" type="1/1" destination="PROJECT" idrefs="z104"></relationship>
@@ -97,12 +97,12 @@
     </object>
     <object type="TEXFILE" id="z105">
         <attribute name="wasopen" type="bool">0</attribute>
-        <attribute name="visiblerect" type="string">{{0, 1022}, {809, 586}}</attribute>
-        <attribute name="lasteditdate" type="date">513795588.54140800237655639648</attribute>
+        <attribute name="visiblerect" type="string">{{81, 1691}, {743, 606}}</attribute>
+        <attribute name="lasteditdate" type="date">513877653.33879500627517700195</attribute>
         <attribute name="istext" type="bool">1</attribute>
-        <attribute name="fileloaddate" type="date">513795605.80982601642608642578</attribute>
+        <attribute name="fileloaddate" type="date">513877654.21032202243804931641</attribute>
         <attribute name="extension" type="string">tex</attribute>
-        <attribute name="cursor" type="string">{2083, 0}</attribute>
+        <attribute name="cursor" type="string">{3170, 0}</attribute>
         <attribute name="sortindex" type="int32">0</attribute>
         <attribute name="name" type="string">report.tex</attribute>
         <attribute name="isexpanded" type="bool">0</attribute>
@@ -112,5 +112,11 @@
         <relationship name="mainfileofproject" type="1/1" destination="PROJECT" idrefs="z104"></relationship>
         <relationship name="children" type="0/0" destination="PROJECTITEM"></relationship>
         <relationship name="bookmarks" type="0/0" destination="BOOKMARK"></relationship>
+    </object>
+    <object type="BOOKMARK" id="z106">
+        <attribute name="text" type="string">\\label{fig:timeLineYear}
+</attribute>
+        <attribute name="linenumber" type="int64">108</attribute>
+        <relationship name="parentfile" type="1/1" destination="FILE"></relationship>
     </object>
 </database>
