@@ -75,13 +75,13 @@
         <relationship name="project" type="1/1" destination="PROJECT" idrefs="z104"></relationship>
     </object>
     <object type="UISETTINGS" id="z103">
-        <attribute name="pdfviewscrollrect" type="string">{{0, 0}, {0, 0}}</attribute>
+        <attribute name="pdfviewscrollrect" type="string">{{0, 1014.6935201402739}, {619.99999999995168, 806.76007005236829}}</attribute>
         <attribute name="showpdfthumbnails" type="bool">0</attribute>
         <attribute name="selectedcontrolstab" type="int16">0</attribute>
         <attribute name="maxoutlinedepth" type="int16">7</attribute>
-        <attribute name="logoutputlevel" type="int16">0</attribute>
-        <attribute name="editorwidth" type="float">818</attribute>
-        <attribute name="controlswidth" type="float">235</attribute>
+        <attribute name="logoutputlevel" type="int16">2</attribute>
+        <attribute name="editorwidth" type="float">846</attribute>
+        <attribute name="controlswidth" type="float">220</attribute>
         <attribute name="consoleview" type="int16">0</attribute>
         <relationship name="project" type="1/1" destination="PROJECT" idrefs="z104"></relationship>
     </object>
@@ -97,12 +97,12 @@
     </object>
     <object type="TEXFILE" id="z105">
         <attribute name="wasopen" type="bool">0</attribute>
-        <attribute name="visiblerect" type="string">{{0, 2}, {781, 334}}</attribute>
-        <attribute name="lasteditdate" type="date">513785839.22148001194000244141</attribute>
+        <attribute name="visiblerect" type="string">{{0, 1022}, {809, 586}}</attribute>
+        <attribute name="lasteditdate" type="date">513795588.54140800237655639648</attribute>
         <attribute name="istext" type="bool">1</attribute>
-        <attribute name="fileloaddate" type="date">513785839.20970797538757324219</attribute>
+        <attribute name="fileloaddate" type="date">513795605.80982601642608642578</attribute>
         <attribute name="extension" type="string">tex</attribute>
-        <attribute name="cursor" type="string">{316, 0}</attribute>
+        <attribute name="cursor" type="string">{2083, 0}</attribute>
         <attribute name="sortindex" type="int32">0</attribute>
         <attribute name="name" type="string">report.tex</attribute>
         <attribute name="isexpanded" type="bool">0</attribute>
