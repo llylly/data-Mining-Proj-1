@@ -47,6 +47,8 @@ readDoc <- function(path) {
 			}
 		}
 		pubdataNode <- headNode[["pubdata"]]
+		
+		# publication date -> correction_data
 		correction_data <- xmlGetAttr(pubdataNode, "date.publication")
 	bodyNode <- rootNode[["body"]]
 		body.contentNode <- bodyNode[["body.content"]]
